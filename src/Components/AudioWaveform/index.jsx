@@ -1,25 +1,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
+import { TrimSlider } from "..";
+import './index.scss';
 
-const AudioWaveform = ({ audioFile }) => {
+const AudioWaveform = props => {
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(1);
   const waveform = useRef(null);
+  const waveformContainer = useRef(null);
 
   useEffect(() => {
     waveform.current = WaveSurfer.create({
-      container: '#audio-waveform',
+      container: waveformContainer.current,
       progressColor: "OrangeRed",
       cursorColor: "OrangeRed",
     });
-    waveform.current.loadBlob(audioFile);
+    waveform.current.loadBlob(props.audioFile);
     waveform.current.on('ready', () => {
       waveform.current.setVolume(volume);
     });
 
     return () => waveform.current.destroy();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioFile]);
+  }, [props.audioFile]);
 
   const handlePlayPause = () => {
     setPlaying(!playing);
@@ -27,7 +32,7 @@ const AudioWaveform = ({ audioFile }) => {
   }
 
   const setToStart = () => {
-    waveform.current.seekTo(0);
+    waveform.current.seekTo(props.trimStart);
   }
 
   const handleVolumeChange = e => {
@@ -36,8 +41,17 @@ const AudioWaveform = ({ audioFile }) => {
   }
 
   return (
-    <div>
-      <div id='audio-waveform' />
+    <div className='audio-container'>
+      <div id='audio-waveform' ref={waveformContainer}>
+        <TrimSlider
+          side='left'
+          setTrim={val => setTrimStart(val/waveformContainer.current.offsetWidth)}
+        />
+        <TrimSlider
+          side='right'
+          setTrim={val => setTrimEnd(1 - val/waveformContainer.current.offsetWidth)}
+        />
+      </div>
 
       <div className='audio-controls'>
         <button>Toggle Agent/Customer</button>
@@ -57,6 +71,8 @@ const AudioWaveform = ({ audioFile }) => {
           min='1'
           max='2'
           step='0.025'
+          onChange={null}
+          value='1'
         />
 
         <label htmlFor='volume'>Volume</label>

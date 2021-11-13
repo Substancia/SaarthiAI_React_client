@@ -1,0 +1,38 @@
+.trim-slider {
+  position: absolute;
+  z-index: 2;
+  height: 130px;
+  width: 0;
+
+  .trim-slider-bg {
+    height: 100%;
+    width: 100%;
+    background-color: grey;
+    opacity: 0.5;
+  }
+
+  .trim-slider-cursor {
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    cursor: pointer;
+  }
+
+  .trim-slider-cursor-left {
+    right: 0;
+  }
+  .trim-slider-cursor-right {
+    left: 0;
+  }
+}
+
+.trim-slider-left {
+  left: 0;
+}
+
+.trim-slider-right {
+  right: 0;
+}

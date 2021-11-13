@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AudioWaveform } from '../../Components';
 
 const DisplayAudioFile = ({ audioFile }) => {
@@ -7,7 +7,13 @@ const DisplayAudioFile = ({ audioFile }) => {
 
   return (
     <div>
-      <AudioWaveform audioFile={audioFile} />
+      <AudioWaveform
+        audioFile={audioFile}
+        trimStart={trimStart}
+        trimEnd={trimEnd}
+        setTrimStart={setTrimStart}
+        setTrimEnd={setTrimEnd}
+      />
     </div>
   );
 }
