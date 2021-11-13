@@ -1,23 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { DisplayAudioFile, UploadAudioPage } from './Containers';
 
-function App() {
+const App = () => {
+  const [audioFile, setAudioFile] = useState(null);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path='/' element={
+          <UploadAudioPage sendAudioFile={setAudioFile} />
+        } />
+
+        <Route path='/analyzeAudio' element={
+          <DisplayAudioFile audioFile={audioFile} />
+        } />
+
+        <Route path='/test' element={<p>{audioFile}</p>} />
+        
+        {/* <Redirect to='/' /> */}
+      </Routes>
     </div>
   );
 }
