@@ -16,7 +16,7 @@ const App = () => {
           <DisplayAudioFile audioFile={audioFile} />
         } />
 
-        <Route path='/test' element={<p>{audioFile}</p>} />
+        <Route path='/test' element={<p>test</p>} />
         
         {/* <Redirect to='/' /> */}
       </Routes>

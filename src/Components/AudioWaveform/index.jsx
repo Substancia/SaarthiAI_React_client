@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { AudioDurationScale, TrimSlider } from "..";
+import { Preloader } from "../../Modals";
 import './index.scss';
 
 const AudioWaveform = props => {
+  const [isLoading, setIsLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [trimStart, setTrimStart] = useState(0);
@@ -24,6 +26,7 @@ const AudioWaveform = props => {
     waveform.current.on('ready', () => {
       waveform.current.setVolume(volume);
       setWaveformWidth(waveformContainer.current.offsetWidth - 2);
+      setIsLoading(false);
     });
     waveform.current.on('finish', () => {
       waveform.current.seekTo(trimStartRef.current);
@@ -80,9 +83,13 @@ const AudioWaveform = props => {
     setVolume(e.target.value);
     waveform.current.setVolume(e.target.value || 1);
   }
-  
+
   return (
     <div className='audio-container'>
+      {
+        isLoading ? <Preloader /> : null
+      }
+
       <div id='audio-waveform' ref={waveformContainer}>
         <TrimSlider
           side='left'
@@ -102,38 +109,47 @@ const AudioWaveform = props => {
       />
 
       <div className='audio-controls'>
-        <button>Toggle Agent/Customer</button>
+        <div className='buttons'>
+          <label className='switch'>
+            <input type='checkbox' />
+            <span className='slider' />
+          </label>
 
-        <button onClick={handlePlayPause}>
-          <i class={`fas fa-${ playing ? 'pause' : 'play' }`} />
-        </button>
+          <button onClick={handlePlayPause} className='no-border'>
+            <i class={`fas fa-${ playing ? 'pause' : 'play' }`} />
+          </button>
 
-        <button onClick={setToStart}><i class='fas fa-undo' /></button>
+          <button onClick={setToStart} className='no-border'>
+            <i class='fas fa-undo' />
+          </button>
 
-        <button><i class='fas fa-cut' /> Trim</button>
+          <button><i class='fas fa-cut' /> Trim</button>
+        </div>
 
-        {/* <label htmlFor='scale'>Scale</label>
-        <input
-          name='scale'
-          type='range'
-          min='1'
-          max='2'
-          step='0.025'
-          onChange={null}
-          value='1'
-        /> */}
-
-        <div className='volume-control'>
+        <div className='scales'>
+          {/* <label htmlFor='scale'>Scale</label>
           <input
-            name='volume'
+            name='scale'
             type='range'
-            min='0'
-            max='1'
+            min='1'
+            max='2'
             step='0.025'
-            onChange={handleVolumeChange}
-            value={volume}
-          />
-          <label htmlFor='volume'>Volume</label>
+            onChange={null}
+            value='1'
+          /> */}
+
+          <div className='volume-control'>
+            <label htmlFor='volume'><i class="fas fa-volume-up" /></label>
+            <input
+              name='volume'
+              type='range'
+              min='0'
+              max='1'
+              step='0.025'
+              onChange={handleVolumeChange}
+              value={volume}
+            />
+          </div>
         </div>
       </div>
     </div>

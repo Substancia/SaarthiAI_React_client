@@ -14,19 +14,27 @@
   .trim-slider-cursor {
     position: absolute;
     z-index: 3;
-    width: 10px;
-    height: 10px;
+    width: 0;
+    height: 0;
     background-color: black;
     cursor: pointer;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
   }
 
   .trim-slider-cursor-left {
-    right: -5px;
-    top: -5px;
+    right: 5px;
+    top: -8px;
+  }
+  .trim-slider-cursor-left:before {
+    content: "\f0d7";
   }
   .trim-slider-cursor-right {
     left: -5px;
-    bottom: -5px;
+    bottom: 11px;
+  }
+  .trim-slider-cursor-right:before {
+    content: "\f0d8";
   }
 }
 
