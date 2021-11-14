@@ -1,9 +1,10 @@
 import React from "react";
 import { AudioWaveform } from '../../Components';
+import './index.scss';
 
 const DisplayAudioFile = ({ audioFile }) => {
   return (
-    <div>
+    <div className='display-audioFile'>
       <AudioWaveform
         audioFile={audioFile}
       />

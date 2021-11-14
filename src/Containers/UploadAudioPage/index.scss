@@ -1,0 +1,22 @@
+.file-upload-form-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #fafafa;
+
+  .file-upload-form {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid grey;
+    border-radius: 5px;
+    box-shadow: 0 5px 2px lightgrey;
+    background-color: white;
+    padding: 10px;
+    
+    & > * {
+      margin: 10px 0;
+    }
+  }
+}
