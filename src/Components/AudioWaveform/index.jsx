@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { TrimSlider } from "..";
+import { AudioDurationScale, TrimSlider } from "..";
 import './index.scss';
 
 const AudioWaveform = props => {
@@ -23,6 +23,7 @@ const AudioWaveform = props => {
     waveform.current.loadBlob(props.audioFile);
     waveform.current.on('ready', () => {
       waveform.current.setVolume(volume);
+      setWaveformWidth(waveformContainer.current.offsetWidth - 2);
     });
     waveform.current.on('finish', () => {
       waveform.current.seekTo(trimStartRef.current);
@@ -37,8 +38,6 @@ const AudioWaveform = props => {
       setPlaying(false);
     });
     
-    setWaveformWidth(waveformContainer.current.offsetWidth - 2);
-
     return () => waveform.current.destroy();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.audioFile]);
@@ -56,6 +55,8 @@ const AudioWaveform = props => {
     const currentPos = waveform.current.getCurrentTime() / waveform.current.getDuration();
     if(currentPos > trimEnd) {
       waveform.current.seekTo(trimEnd);
+      userPaused.current = true;
+      waveform.current.pause();
     }
   }, [trimEnd]);
 
@@ -72,6 +73,7 @@ const AudioWaveform = props => {
   const setToStart = () => {
     waveform.current.seekTo(trimStart);
     waveform.current.play(waveform.current.getCurrentTime(), trimEnd * waveform.current.getDuration());
+    setPlaying(true);
   }
 
   const handleVolumeChange = e => {
@@ -94,16 +96,21 @@ const AudioWaveform = props => {
         />
       </div>
 
+      <AudioDurationScale
+        audioDuration={waveform.current !== null ? waveform.current.getDuration() : null}
+        waveformWidth={waveformWidth || 0}
+      />
+
       <div className='audio-controls'>
         <button>Toggle Agent/Customer</button>
 
         <button onClick={handlePlayPause}>
-          { playing ? 'Pause' : 'Play' }
+          <i class={`fas fa-${ playing ? 'pause' : 'play' }`} />
         </button>
 
-        <button onClick={setToStart}>Restart</button>
+        <button onClick={setToStart}><i class='fas fa-undo' /></button>
 
-        <button>Trim</button>
+        <button><i class='fas fa-cut' /> Trim</button>
 
         {/* <label htmlFor='scale'>Scale</label>
         <input
@@ -116,16 +123,18 @@ const AudioWaveform = props => {
           value='1'
         /> */}
 
-        <label htmlFor='volume'>Volume</label>
-        <input
-          name='volume'
-          type='range'
-          min='0'
-          max='1'
-          step='0.025'
-          onChange={handleVolumeChange}
-          value={volume}
-        />
+        <div className='volume-control'>
+          <input
+            name='volume'
+            type='range'
+            min='0'
+            max='1'
+            step='0.025'
+            onChange={handleVolumeChange}
+            value={volume}
+          />
+          <label htmlFor='volume'>Volume</label>
+        </div>
       </div>
     </div>
   );

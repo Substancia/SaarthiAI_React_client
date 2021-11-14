@@ -1,12 +1,31 @@
 #audio-waveform {
   border: 1px solid black;
+  border-top: none;
   position: relative;
+
+  wave {
+    z-index: 1;
+  }
 }
 
 .audio-container {
-  padding: 5px;
+  padding: 20px;
 
   .audio-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     padding: 5px;
+    
+    & > * {
+      margin: 2px;
+    }
+
+    .volume-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   }
 }
