@@ -11,6 +11,11 @@ const AudioWaveform = props => {
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(1);
   const [waveformWidth, setWaveformWidth] = useState(null);
+  const [zoom, setZoom] = useState(0);
+  const [minZoom, setMinZoom] = useState(0);
+  const [maxZoom, setMaxZoom] = useState(0);
+  const [trimStartZoomOffset, setTrimStartZoomOffset] = useState(0);
+  const [trimEndZoomOffset, setTrimEndZoomOffset] = useState(0);
   const waveform = useRef(null);
   const waveformContainer = useRef(null);
   const trimStartRef = useRef(trimStart);
@@ -26,6 +31,10 @@ const AudioWaveform = props => {
     waveform.current.on('ready', () => {
       waveform.current.setVolume(volume);
       setWaveformWidth(waveformContainer.current.offsetWidth - 2);
+      let ZOOM = (waveformContainer.current.offsetWidth - 2) / waveform.current.getDuration();
+      setZoom(ZOOM);
+      setMinZoom(ZOOM);
+      setMaxZoom(ZOOM);
       setIsLoading(false);
     });
     waveform.current.on('finish', () => {
@@ -63,6 +72,11 @@ const AudioWaveform = props => {
     }
   }, [trimEnd]);
 
+  useEffect(() => {
+    setMaxZoom(Math.min(720, minZoom / (trimEnd - trimStart)));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trimStart, trimEnd]);
+
   const handlePlayPause = () => {
     if(playing) {
       userPaused.current = true;
@@ -84,6 +98,22 @@ const AudioWaveform = props => {
     waveform.current.setVolume(e.target.value || 1);
   }
 
+  const handleZoomChange = e => {
+    setZoom(e.target.value);
+    waveform.current.zoom(e.target.value);
+    waveform.current.toggleScroll();
+
+    let totalOffset = (waveform.current.getDuration() - waveformWidth/zoom) / waveform.current.getDuration();
+    console.log(totalOffset);
+    setTrimStartZoomOffset(trimStart * totalOffset / (trimStart + trimEnd));
+    // setTrimEndZoomOffset(trimEnd)
+  }
+
+  const handleZoomedTrimChange = (widthRatio, offsetTrim, setTrim) => {
+    console.log(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
+    setTrim(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
+  }
+
   return (
     <div className='audio-container'>
       {
@@ -93,13 +123,17 @@ const AudioWaveform = props => {
       <div id='audio-waveform' ref={waveformContainer}>
         <TrimSlider
           side='left'
-          trimLim={trimEnd*waveformWidth}
-          setTrim={val => setTrimStart(val/waveformWidth)}
+          trimLim={(trimEnd - trimEndZoomOffset)*waveformWidth}
+          // setTrim={val => setTrimStart(val/waveformWidth)}
+          setTrim={val => handleZoomedTrimChange(val/waveformWidth, trimStartZoomOffset, setTrimStart)}
+          width={(trimStart - trimStartZoomOffset) * waveformWidth}
         />
         <TrimSlider
           side='right'
-          trimLim={(1 - trimStart)*waveformWidth}
-          setTrim={val => setTrimEnd(1 - val/waveformWidth)}
+          trimLim={(1 - (trimStart - trimStartZoomOffset))*waveformWidth}
+          // setTrim={val => setTrimEnd(1 - val/waveformWidth)}
+          setTrim={val => handleZoomedTrimChange((1 - val/waveformWidth), trimEndZoomOffset, setTrimEnd)}
+          width={(1 - (trimEnd - trimEndZoomOffset)) * waveformWidth}
         />
       </div>
 
@@ -127,16 +161,16 @@ const AudioWaveform = props => {
         </div>
 
         <div className='scales'>
-          {/* <label htmlFor='scale'>Scale</label>
+          <label htmlFor='zoom'>Zoom</label>
           <input
-            name='scale'
+            name='zoom'
             type='range'
-            min='1'
-            max='2'
-            step='0.025'
-            onChange={null}
-            value='1'
-          /> */}
+            min={minZoom.toString()}
+            max={maxZoom.toString()}
+            step={((maxZoom - minZoom) / maxZoom).toString()}
+            onChange={handleZoomChange}
+            value={zoom.toString()}
+          />
 
           <div className='volume-control'>
             <label htmlFor='volume'><i class="fas fa-volume-up" /></label>

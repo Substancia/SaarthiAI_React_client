@@ -1,8 +1,13 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import './index.scss';
 
 const TrimSlider = props => {
   const slider = useRef(null);
+
+  useEffect(() => {
+    slider.current.style.width = props.width;
+    console.log('from slider:', props.width);
+  }, [props.width]);
 
   const dragCursor = () => {
     const e = window.event;
