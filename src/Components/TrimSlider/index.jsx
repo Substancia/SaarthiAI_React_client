@@ -20,7 +20,7 @@ const TrimSlider = props => {
       let widthChange = e.clientX - clickedPos;
       if(props.side === 'right')
         widthChange *= -1;
-      slider.current.style.width = (offsetWidth + widthChange) + 'px';
+      slider.current.style.width = Math.min((offsetWidth + widthChange), props.trimLim) + 'px';
     }
   }
 

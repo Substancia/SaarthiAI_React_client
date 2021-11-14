@@ -14,7 +14,6 @@
   .trim-slider-cursor {
     position: absolute;
     z-index: 3;
-    bottom: 0;
     width: 10px;
     height: 10px;
     background-color: black;
@@ -22,10 +21,12 @@
   }
 
   .trim-slider-cursor-left {
-    right: 0;
+    right: -5px;
+    top: -5px;
   }
   .trim-slider-cursor-right {
-    left: 0;
+    left: -5px;
+    bottom: -5px;
   }
 }
 
