@@ -3,9 +3,11 @@ import { AudioWaveform, TimestampNotesAdd, TimestampNotesList } from '../../Comp
 import './index.scss';
 
 const DisplayAudioFile = ({ audioFile }) => {
+  // states for notes keeping
   const [notes, setNotes] = useState([]);
   const [currentTime, setCurrentTime] = useState(0);
 
+  // processing timestamps into ms precision
   const processTimestamp = timestamp =>
     setCurrentTime(Math.round(timestamp * 1000) / 1000);
 

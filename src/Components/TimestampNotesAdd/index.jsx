@@ -1,9 +1,12 @@
+// component for creating notes at different timestamps
+
 import React, { useState } from "react";
 import './index.scss';
 
 const TimestampNotesAdd = props => {
   const [note, setNote] = useState('');
 
+  // adding notes to the collection and sorting with timestamps
   const addNote = () => {
     props.setNotes(prevNotes => {
       let allNotes = prevNotes.concat([{
