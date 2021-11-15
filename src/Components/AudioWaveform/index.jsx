@@ -43,11 +43,13 @@ const AudioWaveform = props => {
         waveform.current.seekTo(trimStartRef.current);
       }
       setPlaying(false);
+      props.setCurrentTime(waveform.current.getCurrentTime());    // for notes
     });
     waveform.current.on('seek', () => {
       userPaused.current = true;
       waveform.current.pause();
       setPlaying(false);
+      props.setCurrentTime(waveform.current.getCurrentTime());    // for notes
     });
 
     // component destructor
