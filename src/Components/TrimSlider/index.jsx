@@ -5,7 +5,7 @@ const TrimSlider = props => {
   const slider = useRef(null);
 
   useEffect(() => {
-    slider.current.style.width = props.width;
+    slider.current.style.width = props.width + 'px';
     console.log('from slider:', props.width);
   }, [props.width]);
 

@@ -73,6 +73,7 @@ const AudioWaveform = props => {
   }, [trimEnd]);
 
   useEffect(() => {
+    // console.log('maxZoom changed:', Math.min(720, minZoom / (trimEnd - trimStart)));
     setMaxZoom(Math.min(720, minZoom / (trimEnd - trimStart)));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trimStart, trimEnd]);
@@ -99,20 +100,25 @@ const AudioWaveform = props => {
   }
 
   const handleZoomChange = e => {
-    setZoom(e.target.value);
-    waveform.current.zoom(e.target.value);
+    setZoom(parseFloat(e.target.value));
+    waveform.current.zoom(parseFloat(e.target.value));
     waveform.current.toggleScroll();
 
+    // console.log(waveform.current.getDuration(), zoom);
     let totalOffset = (waveform.current.getDuration() - waveformWidth/zoom) / waveform.current.getDuration();
-    console.log(totalOffset);
+    // console.log('totalOffset:', totalOffset);
     setTrimStartZoomOffset(trimStart * totalOffset / (trimStart + trimEnd));
-    // setTrimEndZoomOffset(trimEnd)
+    setTrimEndZoomOffset(trimEnd * totalOffset / (trimStart + trimEnd));
   }
 
   const handleZoomedTrimChange = (widthRatio, offsetTrim, setTrim) => {
-    console.log(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
+    // console.log(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
     setTrim(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
   }
+
+  // console.log(minZoom, maxZoom, zoom, ((maxZoom - minZoom) / 10).toString());
+  // console.log('start:', trimStart, trimStartZoomOffset);
+  // console.log('end:', trimEnd, trimEndZoomOffset);
 
   return (
     <div className='audio-container'>
@@ -167,7 +173,8 @@ const AudioWaveform = props => {
             type='range'
             min={minZoom.toString()}
             max={maxZoom.toString()}
-            step={((maxZoom - minZoom) / maxZoom).toString()}
+            // step={((maxZoom - minZoom) / maxZoom).toString()}
+            step={((maxZoom - minZoom) / 10).toString()}
             onChange={handleZoomChange}
             value={zoom.toString()}
           />

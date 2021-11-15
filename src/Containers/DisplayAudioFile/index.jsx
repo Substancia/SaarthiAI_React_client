@@ -8,6 +8,9 @@ const DisplayAudioFile = ({ audioFile }) => {
       <AudioWaveform
         audioFile={audioFile}
       />
+
+      {/* To implement timestamp-notes in future
+      -- lift trim states up till here */}
     </div>
   );
 }
