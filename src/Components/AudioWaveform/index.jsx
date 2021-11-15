@@ -26,12 +26,14 @@ const AudioWaveform = props => {
       container: waveformContainer.current,
       progressColor: "OrangeRed",
       cursorColor: "OrangeRed",
+      autoCenter: false,
+      hideScrollbar: true,
     });
     waveform.current.loadBlob(props.audioFile);
     waveform.current.on('ready', () => {
       waveform.current.setVolume(volume);
-      setWaveformWidth(waveformContainer.current.offsetWidth - 2);
-      let ZOOM = (waveformContainer.current.offsetWidth - 2) / waveform.current.getDuration();
+      setWaveformWidth(waveformContainer.current.clientWidth);
+      let ZOOM = waveformContainer.current.clientWidth / waveform.current.getDuration();
       setZoom(ZOOM);
       setMinZoom(ZOOM);
       setMaxZoom(ZOOM);
@@ -73,7 +75,6 @@ const AudioWaveform = props => {
   }, [trimEnd]);
 
   useEffect(() => {
-    // console.log('maxZoom changed:', Math.min(720, minZoom / (trimEnd - trimStart)));
     setMaxZoom(Math.min(720, minZoom / (trimEnd - trimStart)));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trimStart, trimEnd]);
@@ -100,46 +101,63 @@ const AudioWaveform = props => {
   }
 
   const handleZoomChange = e => {
-    setZoom(parseFloat(e.target.value));
-    waveform.current.zoom(parseFloat(e.target.value));
-    waveform.current.toggleScroll();
+    let ZOOM = parseFloat(e.target.value);
+    // console.log('ZOOM:', ZOOM);
+    setZoom(ZOOM);
+    if(playing) userPaused.current = true;
+    waveform.current.pause();
+    waveform.current.zoom(ZOOM);
+    // waveform.current.toggleScroll();
 
-    // console.log(waveform.current.getDuration(), zoom);
-    let totalOffset = (waveform.current.getDuration() - waveformWidth/zoom) / waveform.current.getDuration();
-    // console.log('totalOffset:', totalOffset);
-    setTrimStartZoomOffset(trimStart * totalOffset / (trimStart + trimEnd));
-    setTrimEndZoomOffset(trimEnd * totalOffset / (trimStart + trimEnd));
+    let totalOffset = (waveform.current.getDuration() - waveformWidth/ZOOM) / waveform.current.getDuration();
+    setTrimStartZoomOffset(trimStart * totalOffset / (trimStart + 1 - trimEnd));
+    setTrimEndZoomOffset((1 - trimEnd) * totalOffset / (trimStart + 1 - trimEnd));
+
+    positionZoomWave(ZOOM);
   }
 
-  const handleZoomedTrimChange = (widthRatio, offsetTrim, setTrim) => {
-    // console.log(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
-    setTrim(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
+  const handleTrimChange = (widthRatio, offsetTrim, setTrim) => {
+    // setTrim(offsetTrim / waveformWidth + widthRatio * waveformWidth / (zoom * waveform.current.getDuration()));
+    setTrim(offsetTrim + widthRatio);
   }
 
-  // console.log(minZoom, maxZoom, zoom, ((maxZoom - minZoom) / 10).toString());
-  // console.log('start:', trimStart, trimStartZoomOffset);
-  // console.log('end:', trimEnd, trimEndZoomOffset);
+  const positionZoomWave = (ZOOM) => {
+    // FIND the new wave center
+    // seekAndCenter
+    // GO back to original seek position
+
+    let currentPos = waveform.current.getCurrentTime();   // in seconds
+    let waveCenter = waveform.current.getDuration() / 2;
+    let trimCenter = waveCenter * (trimStart + trimEnd);
+    let newWaveCenter = waveCenter + (trimCenter - waveCenter) * (ZOOM - minZoom) / (maxZoom - minZoom);
+    console.log('newWaveCenter fraction:', Math.min(Math.max((newWaveCenter / (2 * waveCenter)), 0), 1));
+    console.log('trimCenter fraction:', (trimStart + trimEnd) / 2);
+
+    waveform.current.seekAndCenter(Math.min(Math.max((newWaveCenter / (2 * waveCenter)), 0), 1));
+
+    waveform.current.seekTo(currentPos / (2 * waveCenter));
+  }
+
+  const waveWidth = waveform.current !== null ? zoom * waveform.current.getDuration() : 0;
+
+  console.log(trimStart, trimEnd);
 
   return (
     <div className='audio-container'>
-      {
-        isLoading ? <Preloader /> : null
-      }
+      <Preloader show={isLoading} />
 
       <div id='audio-waveform' ref={waveformContainer}>
         <TrimSlider
           side='left'
-          trimLim={(trimEnd - trimEndZoomOffset)*waveformWidth}
-          // setTrim={val => setTrimStart(val/waveformWidth)}
-          setTrim={val => handleZoomedTrimChange(val/waveformWidth, trimStartZoomOffset, setTrimStart)}
-          width={(trimStart - trimStartZoomOffset) * waveformWidth}
+          trimLim={(trimEnd + trimEndZoomOffset)*waveWidth}
+          setTrim={val => handleTrimChange(val/waveWidth, trimStartZoomOffset, setTrimStart)}
+          width={(trimStart - trimStartZoomOffset) * waveWidth}
         />
         <TrimSlider
           side='right'
-          trimLim={(1 - (trimStart - trimStartZoomOffset))*waveformWidth}
-          // setTrim={val => setTrimEnd(1 - val/waveformWidth)}
-          setTrim={val => handleZoomedTrimChange((1 - val/waveformWidth), trimEndZoomOffset, setTrimEnd)}
-          width={(1 - (trimEnd - trimEndZoomOffset)) * waveformWidth}
+          trimLim={(1 - (trimStart - trimStartZoomOffset))*waveWidth}
+          setTrim={val => handleTrimChange((1 - val/waveWidth), trimEndZoomOffset, setTrimEnd)}
+          width={(1 - trimEnd - trimEndZoomOffset) * waveWidth}
         />
       </div>
 
@@ -173,7 +191,6 @@ const AudioWaveform = props => {
             type='range'
             min={minZoom.toString()}
             max={maxZoom.toString()}
-            // step={((maxZoom - minZoom) / maxZoom).toString()}
             step={((maxZoom - minZoom) / 10).toString()}
             onChange={handleZoomChange}
             value={zoom.toString()}

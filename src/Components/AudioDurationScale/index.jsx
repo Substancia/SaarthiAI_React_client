@@ -12,9 +12,7 @@ const AudioDurationScale = ({ audioDuration, waveformWidth }) => {
   }, [audioDuration]);
 
   const axisMarkers = [...Array(parseInt(audioDuration / chunkSize) + 1).keys()]
-    // .filter(n => n % 5 === 0)
     .map(n =>
-      // <line x1={(((n * chunkSize / audioDuration) * waveformWidth)).toString()} y1='0' x2={(((n * chunkSize / audioDuration) * waveformWidth)).toString()} y2='10' />
       <text
         key={n}
         x={((n * chunkSize / audioDuration) * waveformWidth).toString()}

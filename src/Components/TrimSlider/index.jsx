@@ -6,7 +6,7 @@ const TrimSlider = props => {
 
   useEffect(() => {
     slider.current.style.width = props.width + 'px';
-    console.log('from slider:', props.width);
+    // console.log('from slider:', props.width);
   }, [props.width]);
 
   const dragCursor = () => {
