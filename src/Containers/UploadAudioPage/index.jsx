@@ -4,9 +4,10 @@ import './index.scss';
 
 const UploadAudioPage = ({ sendAudioFile }) => {
   const [audioFile, setAudioFile] = useState(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate();   // to reroute to waveform analysis route
 
   const uploadFile = () => {
+    // audioFile sent to lifted state in App.js, and rerouted
     sendAudioFile(audioFile);
     navigate('/analyzeAudio');
   }

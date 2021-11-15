@@ -5,6 +5,7 @@ import { Preloader } from "../../Modals";
 import './index.scss';
 
 const AudioWaveform = props => {
+  // states and refs for Wavesurfer.js instance
   const [isLoading, setIsLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
@@ -17,15 +18,18 @@ const AudioWaveform = props => {
   const userPaused = useRef(false);
 
   useEffect(() => {
+    // initializing Wavesurfer instance
     waveform.current = WaveSurfer.create({
       container: waveformContainer.current,
       progressColor: "OrangeRed",
       cursorColor: "OrangeRed",
     });
+    // loading audio file
     waveform.current.loadBlob(props.audioFile);
+    // assigning event listeners
     waveform.current.on('ready', () => {
       waveform.current.setVolume(volume);
-      setWaveformWidth(waveformContainer.current.offsetWidth - 2);
+      setWaveformWidth(waveformContainer.current.clientWidth);
       setIsLoading(false);
     });
     waveform.current.on('finish', () => {
@@ -40,11 +44,18 @@ const AudioWaveform = props => {
       }
       setPlaying(false);
     });
-    
+    waveform.current.on('seek', () => {
+      userPaused.current = true;
+      waveform.current.pause();
+      setPlaying(false);
+    });
+
+    // component destructor
     return () => waveform.current.destroy();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.audioFile]);
 
+  // to bring the cursor to after the start trim
   useEffect(() => {
     const currentPos = waveform.current.getCurrentTime() / waveform.current.getDuration();
     if(currentPos < trimStart) {
@@ -54,6 +65,7 @@ const AudioWaveform = props => {
     trimStartRef.current = trimStart;
   }, [trimStart]);
 
+  // to bring the cursor to before the end trim
   useEffect(() => {
     const currentPos = waveform.current.getCurrentTime() / waveform.current.getDuration();
     if(currentPos > trimEnd) {
@@ -63,6 +75,7 @@ const AudioWaveform = props => {
     }
   }, [trimEnd]);
 
+  // play/pause button
   const handlePlayPause = () => {
     if(playing) {
       userPaused.current = true;
@@ -73,12 +86,14 @@ const AudioWaveform = props => {
     setPlaying(!playing);
   }
 
+  // restart button
   const setToStart = () => {
     waveform.current.seekTo(trimStart);
     waveform.current.play(waveform.current.getCurrentTime(), trimEnd * waveform.current.getDuration());
     setPlaying(true);
   }
 
+  // volume slider
   const handleVolumeChange = e => {
     setVolume(e.target.value);
     waveform.current.setVolume(e.target.value || 1);
@@ -86,11 +101,13 @@ const AudioWaveform = props => {
 
   return (
     <div className='audio-container'>
-      {
-        isLoading ? <Preloader /> : null
-      }
+      {/* Preloader */}
+      <Preloader show={isLoading} />
 
+      {/* Waveform made by wavesurfer.js instance attached to below div */}
       <div id='audio-waveform' ref={waveformContainer}>
+
+        {/* Start and end side trims, hand-written because no built-in trims in the library */}
         <TrimSlider
           side='left'
           trimLim={trimEnd*waveformWidth}
@@ -101,8 +118,10 @@ const AudioWaveform = props => {
           trimLim={(1 - trimStart)*waveformWidth}
           setTrim={val => setTrimEnd(1 - val/waveformWidth)}
         />
+
       </div>
 
+      {/* Audio time scale at bottom of waveform */}
       <AudioDurationScale
         audioDuration={waveform.current !== null ? waveform.current.getDuration() : null}
         waveformWidth={waveformWidth || 0}
@@ -110,34 +129,31 @@ const AudioWaveform = props => {
 
       <div className='audio-controls'>
         <div className='buttons'>
+          {/* Agent/Customer switch, not hooked because not specified */}
           <label className='switch'>
             <input type='checkbox' />
             <span className='slider' />
           </label>
 
+          {/* play/pause button */}
           <button onClick={handlePlayPause} className='no-border'>
             <i class={`fas fa-${ playing ? 'pause' : 'play' }`} />
           </button>
 
+          {/* restart button */}
           <button onClick={setToStart} className='no-border'>
             <i class='fas fa-undo' />
           </button>
 
+          {/* Trim button, not hooked because trimmed file not being sent anywhere */}
           <button><i class='fas fa-cut' /> Trim</button>
         </div>
 
         <div className='scales'>
-          {/* <label htmlFor='scale'>Scale</label>
-          <input
-            name='scale'
-            type='range'
-            min='1'
-            max='2'
-            step='0.025'
-            onChange={null}
-            value='1'
-          /> */}
+          {/* Zoom functionality clashes badly with the hand-written trim functionality
+          hence not included here (written in separate branch on Git) */}
 
+          {/* Volume slider */}
           <div className='volume-control'>
             <label htmlFor='volume'><i class="fas fa-volume-up" /></label>
             <input

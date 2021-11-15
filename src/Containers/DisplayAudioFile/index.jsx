@@ -8,6 +8,9 @@ const DisplayAudioFile = ({ audioFile }) => {
       <AudioWaveform
         audioFile={audioFile}
       />
+      
+      {/* Container made for adding timestamp-notes feature (assignment 1)
+      for if I find time */}
     </div>
   );
 }

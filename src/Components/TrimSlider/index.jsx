@@ -2,19 +2,23 @@ import React, { useRef } from "react";
 import './index.scss';
 
 const TrimSlider = props => {
+  // using ref to make draggable borders
   const slider = useRef(null);
 
+  // subscribing mouse movements to drag movements
   const dragCursor = () => {
     const e = window.event;
     const clickedPos = e.clientX;
     const offsetWidth = slider.current.offsetWidth;
 
+    // click release unsubscribes from the dragging
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
       props.setTrim(slider.current.offsetWidth);
     }
 
+    // tracking mouse movement for dragging borders
     document.onmousemove = () => {
       const e = window.event;
       let widthChange = e.clientX - clickedPos;

@@ -1,9 +1,13 @@
+// Simple axis time scale for waveform, made with SVGs
+
 import React, { useEffect, useState } from "react";
 import './index.scss';
 
 const AudioDurationScale = ({ audioDuration, waveformWidth }) => {
+  // lease count
   const [chunkSize, setChunkSize] = useState(10);
 
+  // setting least count of axis
   useEffect(() => {
     if(audioDuration > 0) {
       let roughSize = audioDuration / 8;
@@ -11,10 +15,9 @@ const AudioDurationScale = ({ audioDuration, waveformWidth }) => {
     }
   }, [audioDuration]);
 
+  // time markers for the axis, written in minutes
   const axisMarkers = [...Array(parseInt(audioDuration / chunkSize) + 1).keys()]
-    // .filter(n => n % 5 === 0)
     .map(n =>
-      // <line x1={(((n * chunkSize / audioDuration) * waveformWidth)).toString()} y1='0' x2={(((n * chunkSize / audioDuration) * waveformWidth)).toString()} y2='10' />
       <text
         key={n}
         x={((n * chunkSize / audioDuration) * waveformWidth).toString()}
@@ -22,7 +25,8 @@ const AudioDurationScale = ({ audioDuration, waveformWidth }) => {
         fill='black'
         fontSize='14'
       >
-        {(n * chunkSize).toString() + 's'}
+        {/* {(n * chunkSize).toString() + 's'} */}
+        {`${Math.floor(n * chunkSize / 60)}:${('0' + (n * chunkSize) % 60).slice(-2)}`}
       </text>
     );
 
