@@ -37,7 +37,7 @@ const AudioWaveform = props => {
       setPlaying(false);
     });
     waveform.current.on('pause', () => {
-      if(userPaused.current) {
+      if(userPaused.current) {    // if not paused by user, send cursor to start
         userPaused.current = false;
       } else {
         waveform.current.seekTo(trimStartRef.current);
@@ -55,7 +55,7 @@ const AudioWaveform = props => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.audioFile]);
 
-  // to bring the cursor to after the start trim
+  // to bring the cursor to after the left trim
   useEffect(() => {
     const currentPos = waveform.current.getCurrentTime() / waveform.current.getDuration();
     if(currentPos < trimStart) {
@@ -65,7 +65,7 @@ const AudioWaveform = props => {
     trimStartRef.current = trimStart;
   }, [trimStart]);
 
-  // to bring the cursor to before the end trim
+  // to bring the cursor to before the right trim
   useEffect(() => {
     const currentPos = waveform.current.getCurrentTime() / waveform.current.getDuration();
     if(currentPos > trimEnd) {
@@ -74,6 +74,7 @@ const AudioWaveform = props => {
       waveform.current.pause();
     }
   }, [trimEnd]);
+
 
   // play/pause button
   const handlePlayPause = () => {
@@ -99,6 +100,7 @@ const AudioWaveform = props => {
     waveform.current.setVolume(e.target.value || 1);
   }
 
+
   return (
     <div className='audio-container'>
       {/* Preloader */}
@@ -107,7 +109,7 @@ const AudioWaveform = props => {
       {/* Waveform made by wavesurfer.js instance attached to below div */}
       <div id='audio-waveform' ref={waveformContainer}>
 
-        {/* Start and end side trims, hand-written because no built-in trims in the library */}
+        {/* left and right trims, hand-written because no built-in trims in the library */}
         <TrimSlider
           side='left'
           trimLim={trimEnd*waveformWidth}
@@ -150,8 +152,9 @@ const AudioWaveform = props => {
         </div>
 
         <div className='scales'>
-          {/* Zoom functionality clashes badly with the hand-written trim functionality
-          hence not included here (written in separate branch on Git) */}
+          {/* Zoom functionality causing mismatched trimming with the
+          hand-written trim functionality hence not included here
+          (implemented in separate branch 'zoom-scale' on Git) */}
 
           {/* Volume slider */}
           <div className='volume-control'>

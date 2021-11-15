@@ -15,7 +15,7 @@ const AudioDurationScale = ({ audioDuration, waveformWidth }) => {
     }
   }, [audioDuration]);
 
-  // time markers for the axis, written in minutes
+  // time markers for the axis, written in minutes (seconds version commented)
   const axisMarkers = [...Array(parseInt(audioDuration / chunkSize) + 1).keys()]
     .map(n =>
       <text

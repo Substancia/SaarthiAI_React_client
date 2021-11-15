@@ -10,7 +10,7 @@ const DisplayAudioFile = ({ audioFile }) => {
       />
       
       {/* Container made for adding timestamp-notes feature (assignment 1)
-      for if I find time */}
+      for future implementations */}
     </div>
   );
 }

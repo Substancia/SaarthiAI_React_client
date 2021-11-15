@@ -17,6 +17,10 @@ const UploadAudioPage = ({ sendAudioFile }) => {
       <div className='file-upload-form'>
         <input type='file' accept='audio/*' onChange={e => setAudioFile(e.target.files[0])} />
         <button onClick={uploadFile} disabled={audioFile === null}>Upload</button>
+
+        <hr />
+        <a href='https://substancia.github.io/randomStorage/testmusic.mp3'target='_blank'
+          rel='noopener noreferrer'><button>Download sample music</button></a>
       </div>
     </div>
   );

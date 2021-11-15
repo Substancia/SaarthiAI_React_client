@@ -1,3 +1,5 @@
+// reusable trim component, used for both left and right trim with props.side
+
 import React, { useRef } from "react";
 import './index.scss';
 
@@ -11,10 +13,11 @@ const TrimSlider = props => {
     const clickedPos = e.clientX;
     const offsetWidth = slider.current.offsetWidth;
 
-    // click release unsubscribes from the dragging
+    // click release unsubscribes mouse from the dragging
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
+      // sending resized division width as "trim" width. wave portion behind trim div is inaccessible.
       props.setTrim(slider.current.offsetWidth);
     }
 
