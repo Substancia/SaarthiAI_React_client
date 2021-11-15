@@ -1,4 +1,13 @@
-# Getting Started with Create React App
+# Audio analyzer with ReactJS and Wavesurfer.js
+
+Uses Wavesurfer.js for rendering waveforms and playing music.
+Custom hand-written trim-functionality.
+
+Warning: Zoom functionality presently incompatible with custom trim functionality. Fixing in progress.
+
+Written as assignment for Saarthi.ai recruitments.
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
